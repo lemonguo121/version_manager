@@ -28,10 +28,10 @@ app.get('/api/version', (req, res) => {
   const row = db.prepare('SELECT * FROM version WHERE id = 1').get();
   if (!row) {
     return res.json({
-      versionName: "1.0.0",
-      versionCode: 100,
-      downLoadUrl: "",
-      updateDes: "",
+      versionName: "1.0.18",
+      versionCode: 1018,
+      downLoadUrl: "https://wwym.lanzouq.com/LMPlayer",
+      updateDes: "1、新增小说、漫画资源\n2、优化切换站点交互\n3、修复部分小说、漫画获取资源失败后导致后面内容无法获取",
       isMust: false
     });
   }
