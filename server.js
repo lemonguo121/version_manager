@@ -1,45 +1,62 @@
 const express = require('express');
 const cors = require('cors');
-const Database = require('better-sqlite3');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const port = 3001;
 
-// 初始化 SQLite 数据库
-const db = new Database('version.db');
+// 文件存储路径
+const dataDir = path.join(__dirname, 'data');
+const configFile = path.join(dataDir, 'version.json');
 
-// 建表（字段和你之前 JSON 一致）
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS version (
-    id INTEGER PRIMARY KEY CHECK (id = 1),  -- 永远只有一条记录
-    versionName TEXT NOT NULL,
-    versionCode INTEGER NOT NULL,
-    downLoadUrl TEXT NOT NULL,
-    updateDes TEXT NOT NULL,
-    isMust INTEGER NOT NULL
-  )
-`).run();
+// 确保 data 目录存在
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir);
+}
 
+// 初始化默认配置
+const defaultConfig = {
+  versionName: "1.0.18",
+  versionCode: 1018,
+  downLoadUrl: "https://wwym.lanzouq.com/LMPlayer",
+  updateDes: "1、新增小说、漫画资源\n2、优化切换站点交互\n3、修复部分小说、漫画获取资源失败后导致后面内容无法获取",
+  isMust: false
+};
+
+// 加载配置
+function loadConfig() {
+  if (fs.existsSync(configFile)) {
+    try {
+      const content = fs.readFileSync(configFile, 'utf-8');
+      return JSON.parse(content);
+    } catch (e) {
+      console.error('读取配置文件失败，使用默认配置', e);
+      return {...defaultConfig};
+    }
+  } else {
+    // 文件不存在就写入默认配置
+    fs.writeFileSync(configFile, JSON.stringify(defaultConfig, null, 2), 'utf-8');
+    return {...defaultConfig};
+  }
+}
+
+// 保存配置
+function saveConfig(newConfig) {
+  fs.writeFileSync(configFile, JSON.stringify(newConfig, null, 2), 'utf-8');
+}
+
+// Express 配置
 app.use(cors());
 app.use(express.json());
 
-// 获取版本配置
+// GET 获取版本配置
 app.get('/api/version', (req, res) => {
-  const row = db.prepare('SELECT * FROM version WHERE id = 1').get();
-  if (!row) {
-    return res.json({
-      versionName: "1.0.18",
-      versionCode: 1018,
-      downLoadUrl: "https://wwym.lanzouq.com/LMPlayer",
-      updateDes: "1、新增小说、漫画资源\n2、优化切换站点交互\n3、修复部分小说、漫画获取资源失败后导致后面内容无法获取",
-      isMust: false
-    });
-  }
-  row.isMust = !!row.isMust; // 转换 0/1 为 true/false
-  res.json(row);
+  const config = loadConfig();
+  res.json(config);
 });
 
-// 更新版本配置
+// POST 更新版本配置
 app.post('/api/version', (req, res) => {
   const { versionName, versionCode, downLoadUrl, updateDes, isMust } = req.body;
 
@@ -47,16 +64,8 @@ app.post('/api/version', (req, res) => {
     return res.status(400).json({ error: '缺少必要字段或格式错误' });
   }
 
-  db.prepare(`
-    INSERT INTO version (id, versionName, versionCode, downLoadUrl, updateDes, isMust)
-    VALUES (1, ?, ?, ?, ?, ?)
-    ON CONFLICT(id) DO UPDATE SET
-      versionName=excluded.versionName,
-      versionCode=excluded.versionCode,
-      downLoadUrl=excluded.downLoadUrl,
-      updateDes=excluded.updateDes,
-      isMust=excluded.isMust
-  `).run(versionName, versionCode, downLoadUrl, updateDes, isMust ? 1 : 0);
+  const newConfig = { versionName, versionCode, downLoadUrl, updateDes, isMust };
+  saveConfig(newConfig);
 
   res.json({ success: true });
 });
