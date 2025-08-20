@@ -17,8 +17,8 @@ if (!fs.existsSync(dataDir)) {
 
 // 初始化默认配置
 const defaultConfig = {
-  versionName: "1.0.18",
-  versionCode: 1018,
+  versionName: "1.0.19",
+  versionCode: 1019,
   downLoadUrl: "https://wwym.lanzouq.com/LMPlayer",
   updateDes: "1、新增小说、漫画资源\n2、优化切换站点交互\n3、修复部分小说、漫画获取资源失败后导致后面内容无法获取",
   isMust: false
