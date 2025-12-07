@@ -1,0 +1,44 @@
+{
+  "splash": [
+    {
+      "id": 1,
+      "title": "开屏广告示例",
+      "imageUrl": "https://picsum.photos/seed/splash/1600/900",
+      "linkUrl": "https://www.baidu.com",
+      "style": {},
+      "status": 1
+    }
+  ],
+  "home_banner": [
+    {
+      "id": 2,
+      "title": "首页Banner-1",
+      "imageUrl": "https://picsum.photos/seed/banner1/1600/900",
+      "linkUrl": "https://www.baidu.com",
+      "style": {
+        "ratio": "16:9"
+      },
+      "status": 1
+    },
+    {
+      "id": 3,
+      "title": "首页Banner-2",
+      "imageUrl": "https://picsum.photos/seed/banner2/1600/900",
+      "linkUrl": "https://x.com/headbuff00",
+      "style": {
+        "ratio": "16:9"
+      },
+      "status": 1
+    }
+  ],
+  "popup": [],
+  "test": [
+    {
+      "id": 1765134614920,
+      "title": "新广告1233123",
+      "imageUrl": "123123123",
+      "linkUrl": "123123123",
+      "status": 1
+    }
+  ]
+}
